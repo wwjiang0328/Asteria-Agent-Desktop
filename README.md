@@ -43,12 +43,16 @@ Key capabilities:
 - Editable artifact generation and verification
 - Native desktop distribution for Windows and macOS
 
-## Source and releases
+## Official distribution
 
-- Product source: [Asteria-Agent](https://github.com/wwjiang0328/Asteria-Agent)
-- Public website and documentation: [Asteria-Hub](https://github.com/wwjiang0328/Asteria-Hub)
+本仓库只公开官方安装包、版本信息和构建发布流程。Asteria Agent 的应用源码为闭源专有代码，不在本仓库中提供。
+
+This is the official public distribution repository for Asteria Agent desktop installers. It contains release workflows, version information, and downloadable Windows/macOS packages only. The Asteria Agent application source code is proprietary and is not included in this repository.
+
+- Official website and documentation: [asteria.jackcloud.online](https://asteria.jackcloud.online)
+- Public product information: [Asteria Hub](https://github.com/wwjiang0328/Asteria-Hub)
 - Release installers: this repository's [Releases](https://github.com/wwjiang0328/Asteria-Agent-Desktop/releases)
 
-## License
+## License and usage
 
-See the license and source distribution in the [Asteria-Agent](https://github.com/wwjiang0328/Asteria-Agent) repository.
+The desktop installers and other release assets are distributed for use under the terms provided by Asteria. This public repository does not grant access to the proprietary application source code.
