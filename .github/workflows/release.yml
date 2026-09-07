@@ -1,0 +1,82 @@
+name: Build & Release (Tauri)
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-14
+            platform_name: macos-arm64
+          - os: windows-latest
+            platform_name: windows-x64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          repository: wwjiang0328/Asteria-Agent
+          ref: ${{ github.ref_name }}
+          token: ${{ secrets.GH_PAT }}
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install frontend dependencies
+        run: npm install --include=optional
+
+      - name: Install all platform-specific native bindings
+        run: node scripts/install-platform-bindings.mjs
+
+      - name: Verify release version metadata
+        run: node scripts/version-consistency.cjs "${{ github.ref_name }}"
+
+      - name: Sync skills into bundle resources
+        run: npm run sync-skills
+
+      - name: Sync agent-browser sidecar
+        run: npm run sync-agent-browser
+
+      - name: Build Tauri app
+        run: npm run tauri build
+
+      - name: Rename artifacts
+        shell: bash
+        run: |
+          TAG="${{ github.ref_name }}"
+          TAG="${TAG#v}"
+          mkdir -p release_artifacts
+          if [ "${{ runner.os }}" == "macOS" ]; then
+            cp src-tauri/target/release/bundle/dmg/Asteria_*.dmg "release_artifacts/Asteria-mac-${TAG}.dmg"
+          else
+            cp src-tauri/target/release/bundle/nsis/Asteria_*.exe "release_artifacts/Asteria-win-${TAG}.exe"
+          fi
+
+      - name: Create or update release with renamed artifacts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          TAG="${{ github.ref_name }}"
+          # Try to create release; if it already exists (other matrix job), just upload
+          gh release create "$TAG" release_artifacts/* \
+            --repo wwjiang0328/Asteria-Agent-Desktop \
+            --title "Asteria $TAG" \
+            --notes "See the assets to download and install this version." \
+            --latest 2>/dev/null \
+          || gh release upload "$TAG" release_artifacts/* \
+            --repo wwjiang0328/Asteria-Agent-Desktop --clobber
