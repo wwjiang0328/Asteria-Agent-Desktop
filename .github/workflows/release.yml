@@ -25,7 +25,9 @@ jobs:
       - uses: actions/checkout@v5
         with:
           repository: wwjiang0328/Asteria-Agent
-          ref: ${{ github.ref_name }}
+          # The release controller creates this source tag from the configured
+          # Asteria-Agent 0908-zj branch; checking out the tag preserves provenance.
+          ref: refs/tags/${{ github.ref_name }}
           token: ${{ secrets.GH_PAT }}
 
       - uses: actions/setup-node@v6
@@ -61,9 +63,9 @@ jobs:
           TAG="${TAG#v}"
           mkdir -p release_artifacts
           if [ "${{ runner.os }}" == "macOS" ]; then
-            cp src-tauri/target/release/bundle/dmg/Asteria_*.dmg "release_artifacts/Asteria-mac-${TAG}.dmg"
+            cp src-tauri/target/release/bundle/dmg/Zimo_*.dmg "release_artifacts/Zimo-mac-${TAG}.dmg"
           else
-            cp src-tauri/target/release/bundle/nsis/Asteria_*.exe "release_artifacts/Asteria-win-${TAG}.exe"
+            cp src-tauri/target/release/bundle/nsis/Zimo_*.exe "release_artifacts/Zimo-win-${TAG}.exe"
           fi
 
       - name: Create or update release with renamed artifacts
@@ -75,7 +77,7 @@ jobs:
           # Try to create release; if it already exists (other matrix job), just upload
           gh release create "$TAG" release_artifacts/* \
             --repo wwjiang0328/Asteria-Agent-Desktop \
-            --title "Asteria $TAG" \
+            --title "Zimo $TAG" \
             --notes "See the assets to download and install this version." \
             --latest 2>/dev/null \
           || gh release upload "$TAG" release_artifacts/* \
