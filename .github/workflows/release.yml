@@ -24,9 +24,9 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          repository: wwjiang0328/Asteria-Agent
+          repository: wwjiang0328/Zimo_Agent
           # The release controller creates this source tag from the configured
-          # Asteria-Agent 0908-zj branch; checking out the tag preserves provenance.
+          # Zimo_Agent main branch; checking out the tag preserves provenance.
           ref: refs/tags/${{ github.ref_name }}
           token: ${{ secrets.GH_PAT }}
 
